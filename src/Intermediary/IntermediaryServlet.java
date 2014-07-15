@@ -1,7 +1,6 @@
 package Intermediary;
 
 import java.io.IOException;
-import java.util.Date;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -15,7 +14,6 @@ import javax.servlet.http.HttpServletResponse;
 @WebServlet("/IntermediaryServlet")
 public class IntermediaryServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
-	private Date lastUpdate = null;
 
     /**
      * Default constructor. 
