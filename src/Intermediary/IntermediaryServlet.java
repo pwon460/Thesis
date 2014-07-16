@@ -15,9 +15,6 @@ import javax.servlet.http.HttpServletResponse;
 public class IntermediaryServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 
-    /**
-     * Default constructor. 
-     */
     public IntermediaryServlet() {
         // TODO Auto-generated constructor stub
     }

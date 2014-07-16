@@ -13,19 +13,18 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Enumeration;
 import java.util.HashMap;
-import java.util.TimerTask;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipException;
 import java.util.zip.ZipFile;
 import static java.nio.file.StandardCopyOption.*;
 
-public class CheckTDX extends TimerTask {
+public class CheckTDX implements Runnable {
 
-	private boolean hasUpdate = false;
+	private static boolean hasUpdate = false;
 	private UpdateChecker checker = null;
-	private String current = System.getProperty("user.dir");
-	private String path1 = ""; // variable for file that app users will receive
-	private String path2 = ""; // newly downloaded file is assigned here
+	private static String current = System.getProperty("user.dir");
+	private static String path1 = ""; // variable for file that app users will receive
+	private static String path2 = ""; // newly downloaded file is assigned here
 
 	public CheckTDX(UpdateChecker updateChecker) {
 		this.checker = updateChecker;
@@ -55,8 +54,6 @@ public class CheckTDX extends TimerTask {
 					compareEntries(zip1, zip2);
 				}
 
-				handleZip2(path1, path2);
-
 				if (hasUpdate) {
 					checker.setUpdate(true);
 				}
@@ -64,6 +61,13 @@ public class CheckTDX extends TimerTask {
 			} catch (ZipException e) { // zip malformed - eg. server died while
 										// dl'ing
 				e.printStackTrace();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			
+			System.out.println("cleaning up extra zip");
+			try {
+				handleZip2();
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
@@ -109,17 +113,19 @@ public class CheckTDX extends TimerTask {
 				path1 = file.getCanonicalPath();
 			}
 
-			OutputStream output = new FileOutputStream(file);
-
-			int read = 0;
-			byte[] bytes = new byte[1024];
-
-			while ((read = input.read(bytes)) != -1) {
-				output.write(bytes, 0, read);
-			}
-
+//			OutputStream output = new FileOutputStream(file);
+//
+//			int read = 0;
+//			byte[] bytes = new byte[1024];
+//
+//			while ((read = input.read(bytes)) != -1) {
+//				output.write(bytes, 0, read);
+//			}
+//
+//			output.close();
+			input.close();
 			System.out.println("done!");
-
+			
 		} catch (MalformedURLException e1) {
 			e1.printStackTrace();
 		} catch (IOException e) {
@@ -127,7 +133,7 @@ public class CheckTDX extends TimerTask {
 		}
 	}
 	
-	private void handleZip2(String path1, String path2) throws IOException {
+	private void handleZip2() throws IOException {
 		Path p1 = Paths.get(path1);
 		Path p2 = Paths.get(path2);
 
@@ -139,6 +145,7 @@ public class CheckTDX extends TimerTask {
 	}
 	
 	private void removeZip (String path) {
+		System.out.println(path);
 		Path p = Paths.get(path);
 		try {
 			Files.deleteIfExists(p);
