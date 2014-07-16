@@ -32,7 +32,7 @@ public class CheckTDX implements Runnable {
 
 	@Override
 	public void run() {
-		System.out.println("hi");
+		System.out.println("downloading file from tdx");
 		downloadZip(); // download file from TDX and save it as temp.zip
 		
 		while (!path2.equals("") && isZipMalformed(path2)) {
@@ -103,7 +103,6 @@ public class CheckTDX implements Runnable {
 			Authenticator.setDefault(new CustomAuthenticator());
 			URL url = new URL(
 					"https://tdx.transportnsw.info/download/files/transxchange.zip");
-			System.out.println(url.getFile());
 			InputStream input = url.openStream();
 			File file = new File(current, "temp.zip");
 			// if temp exists, save as temp2
@@ -114,23 +113,25 @@ public class CheckTDX implements Runnable {
 				if (!isZipMalformed(path1)) { 
 					file = new File(current, "temp2.zip");
 					path2 = file.getCanonicalPath();
+					System.out.println("saving to " + path2);
 				} else {
-					System.out.println("zip1 malformed, overwriting");
+					System.out.println("malformed zip detected, overwriting");
+					System.out.println("saving to " + path1);
 				}
 			} else { // otherwise save as temp
 				path1 = file.getCanonicalPath();
 			}
 
-//			OutputStream output = new FileOutputStream(file);
-//
-//			int read = 0;
-//			byte[] bytes = new byte[1024];
-//
-//			while ((read = input.read(bytes)) != -1) {
-//				output.write(bytes, 0, read);
-//			}
-//
-//			output.close();
+			OutputStream output = new FileOutputStream(file);
+
+			int read = 0;
+			byte[] bytes = new byte[1024];
+
+			while ((read = input.read(bytes)) != -1) {
+				output.write(bytes, 0, read);
+			}
+
+			output.close();
 			input.close();
 			System.out.println("done!");
 			
