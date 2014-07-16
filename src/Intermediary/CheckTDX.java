@@ -122,16 +122,16 @@ public class CheckTDX implements Runnable {
 				path1 = file.getCanonicalPath();
 			}
 
-//			OutputStream output = new FileOutputStream(file);
-//
-//			int read = 0;
-//			byte[] bytes = new byte[1024];
-//
-//			while ((read = input.read(bytes)) != -1) {
-//				output.write(bytes, 0, read);
-//			}
-//
-//			output.close();
+			OutputStream output = new FileOutputStream(file);
+
+			int read = 0;
+			byte[] bytes = new byte[1024];
+
+			while ((read = input.read(bytes)) != -1) {
+				output.write(bytes, 0, read);
+			}
+
+			output.close();
 			input.close();
 			System.out.println("done!");
 			
