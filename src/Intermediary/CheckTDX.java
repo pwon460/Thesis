@@ -32,6 +32,7 @@ public class CheckTDX implements Runnable {
 
 	@Override
 	public void run() {
+		System.out.println("hi");
 		downloadZip(); // download file from TDX and save it as temp.zip
 		
 		while (!path2.equals("") && isZipMalformed(path2)) {
@@ -42,7 +43,7 @@ public class CheckTDX implements Runnable {
 		// if path1 (ie. file1) doesn't exist, this means the file downloaded is
 		// the first one for the server or the server was just turned on
 		if (path2.equals("")) {
-			checker.setUpdate(true);
+			checker.handleUpdate(path1);
 		} else { // there exists an old file and a new one has just been
 					// downloaded
 			try {
@@ -54,13 +55,9 @@ public class CheckTDX implements Runnable {
 					compareEntries(zip1, zip2);
 				}
 
-				if (hasUpdate) {
-					checker.setUpdate(true);
-				}
-				
 				zip1.close();
 				zip2.close();
-
+				
 			} catch (ZipException e) { // zip malformed - eg. server died while
 										// dl'ing
 				e.printStackTrace();
@@ -69,11 +66,18 @@ public class CheckTDX implements Runnable {
 			}
 			
 			System.out.println("cleaning up extra zip");
+			// clean up files such that only most recent version remains
 			try {
 				handleZip2();
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
+			
+			// pass it forward to data extraction part
+			if (hasUpdate) {
+				checker.handleUpdate(path1);
+			}
+			
 		}
 
 	}
@@ -142,6 +146,10 @@ public class CheckTDX implements Runnable {
 		Path p2 = Paths.get(path2);
 
 		if (hasUpdate) { // old zip superceeded by new zip, ie. replace old copy
+			// TODO: THERE IS A CHANCE THAT THIS FILE WILL BE IN USE
+			// BY THE SERVLET OR EXTRACTOR
+			// NEED TO PUT A LOCK ON IT OR SOMETHING
+			// BEFORE IT CAN BE REPLACED BY NEWER VERSION
 			Files.move(p2, p1, REPLACE_EXISTING);
 		} else { // new zip is same as old zip, ie. it's useless
 			removeZip(path2);
