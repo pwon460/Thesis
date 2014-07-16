@@ -122,16 +122,16 @@ public class CheckTDX implements Runnable {
 				path1 = file.getCanonicalPath();
 			}
 
-			OutputStream output = new FileOutputStream(file);
-
-			int read = 0;
-			byte[] bytes = new byte[1024];
-
-			while ((read = input.read(bytes)) != -1) {
-				output.write(bytes, 0, read);
-			}
-
-			output.close();
+//			OutputStream output = new FileOutputStream(file);
+//
+//			int read = 0;
+//			byte[] bytes = new byte[1024];
+//
+//			while ((read = input.read(bytes)) != -1) {
+//				output.write(bytes, 0, read);
+//			}
+//
+//			output.close();
 			input.close();
 			System.out.println("done!");
 			
@@ -151,8 +151,12 @@ public class CheckTDX implements Runnable {
 			// BY THE SERVLET OR EXTRACTOR
 			// NEED TO PUT A LOCK ON IT OR SOMETHING
 			// BEFORE IT CAN BE REPLACED BY NEWER VERSION
+			System.out.println("new file is different to old one");
+			System.out.println("replacing old file with new one");
 			Files.move(p2, p1, REPLACE_EXISTING);
 		} else { // new zip is same as old zip, ie. it's useless
+			System.out.println("newly downloaded file is same as old one");
+			System.out.println("removing duplicated version");
 			removeZip(path2);
 		}
 	}
