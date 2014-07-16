@@ -11,10 +11,10 @@ public class test {
 		UpdateChecker checker = new UpdateChecker();
 		checker.checkForUpdates();
 		
-		while (checker.getStatus() == false) {
+//		while (checker.getStatus() == false) {
 //			System.out.println("false");
-		}
-		System.out.println("true");
+//		}
+//		System.out.println("true");
 		
 	}
 	

@@ -57,6 +57,9 @@ public class CheckTDX implements Runnable {
 				if (hasUpdate) {
 					checker.setUpdate(true);
 				}
+				
+				zip1.close();
+				zip2.close();
 
 			} catch (ZipException e) { // zip malformed - eg. server died while
 										// dl'ing
@@ -81,6 +84,7 @@ public class CheckTDX implements Runnable {
 
 		try {
 			ZipFile zip = new ZipFile(new File(path));
+			zip.close();
 		} catch (ZipException e) {
 			isValid = true;
 		} catch (IOException e) {
