@@ -1,7 +1,5 @@
 package Intermediary;
 
-import java.io.File;
-import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Calendar;
@@ -10,12 +8,15 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
+import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
+import javax.servlet.annotation.WebListener;
 
 import Extractor.DataHandler;
 import Extractor.FileHandler;
 
+@WebListener
 public class UpdateChecker implements ServletContextListener {
 
 	private static final int UPDATE_HOUR = 5; // set this, 24hr time
@@ -24,10 +25,11 @@ public class UpdateChecker implements ServletContextListener {
 																// this
 	private static Calendar c; // used for storing time of last update
 	private static int INIT_DELAY = 0;
-	private static final int PERIOD = 5; // change this 
+	private static final int PERIOD = 5; // change this
 	private static ScheduledExecutorService scheduler;
 	private static FileHandler fileHandler = new DataHandler();
-	private static File updatedData;
+	private static final int MILLIS_IN_30_SECS = 30000;
+	private static ServletContext ctx;
 
 	// used for testing
 	public void checkForUpdates() {
@@ -43,6 +45,7 @@ public class UpdateChecker implements ServletContextListener {
 	@Override
 	// used by servlet context/container
 	public void contextInitialized(ServletContextEvent event) {
+		ctx = event.getServletContext();
 		checkForUpdates();
 	}
 
@@ -56,7 +59,8 @@ public class UpdateChecker implements ServletContextListener {
 		// save timestamp of new update/version of data
 		c = Calendar.getInstance(TimeZone.getTimeZone(TIME_ZONE));
 		Path p = Paths.get(path);
-		updatedData = fileHandler.extractData(p.toFile());
+		ctx.setAttribute("mostRecentData", fileHandler.extractData(p.toFile()));
+		ctx.setAttribute("timeOfRetrieval", c);
 	}
 
 	// TODO maybe turn this into wait/notify... not sure how to do
@@ -64,15 +68,16 @@ public class UpdateChecker implements ServletContextListener {
 	private void exitWhenTimeToUpdate() {
 		Calendar c = Calendar.getInstance(TimeZone.getTimeZone(TIME_ZONE));
 
-		// sits in here until hour is correct
-		while (c.get(Calendar.HOUR_OF_DAY) != UPDATE_HOUR) {
+		// sits in here until hour and minutes are correct
+		while (c.get(Calendar.HOUR_OF_DAY) != UPDATE_HOUR
+				&& c.get(Calendar.MINUTE) != UPDATE_MINUTES) {
 			c = Calendar.getInstance(TimeZone.getTimeZone(TIME_ZONE));
-		}
-
-		// sits in here until minutes are correct
-		while (c.get(Calendar.MINUTE) != UPDATE_MINUTES) {
-			c = Calendar.getInstance(TimeZone.getTimeZone(TIME_ZONE));
+			// sleep for half a minute to not waste resources
+			try {
+				Thread.sleep(MILLIS_IN_30_SECS);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
 		}
 	}
-
 }
