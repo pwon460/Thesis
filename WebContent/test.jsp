@@ -8,5 +8,6 @@
 </head>
 <body>
 <p>${status}</p>
+<p>${timestamp}</p>
 </body>
 </html>

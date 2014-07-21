@@ -11,15 +11,23 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Calendar;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.TimeZone;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipException;
 import java.util.zip.ZipFile;
 
+import javax.servlet.ServletContext;
+
 import org.quartz.Job;
+import org.quartz.JobDataMap;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
+
+import extractor.DataHandler;
+import extractor.FileHandler;
 
 import static java.nio.file.StandardCopyOption.*;
 
@@ -31,11 +39,26 @@ public class CheckTDX implements Job {
 	private static String path1 = ""; // variable for file that app users will
 										// receive
 	private static String path2 = ""; // newly downloaded file is assigned here
+	private static ServletContext ctx;
+	private static String timezone;
 
 	@Override
 	// public void run() {
 	public void execute(JobExecutionContext context)
 			throws JobExecutionException {
+		System.out.println("executing task");
+	    JobDataMap dataMap = context.getJobDetail().getJobDataMap();
+	    ctx = (ServletContext) dataMap.get("context");
+	    timezone = dataMap.getString("timezone");
+	
+	    if (ctx == null) {
+	    	System.err.println("context unable to be initialized");
+	    } else if (timezone == null) {
+	    	System.err.println("timezone unable to be obtained");
+	    }
+	    
+		hasUpdate = false; // reset state before downloading, assume there is no update to start with
+		
 		System.out.println("downloading file from tdx");
 		downloadZip(); // download file from TDX and save it as temp.zip
 
@@ -44,13 +67,15 @@ public class CheckTDX implements Job {
 			downloadZip();
 		}
 
-		System.out.println(path1);
-		System.out.println(path2);
+		System.out.println("path of zip1 is: " + path1);
+		System.out.println("path of zip2 is: " + path2);
 
 		// if path1 (ie. file1) doesn't exist, this means the file downloaded is
 		// the first one for the server or the server was just turned on
 		if (path2.equals("")) {
-			checker.handleUpdate(path1);
+			System.out.println("handling " + path1);
+			hasUpdate = true;
+			handleUpdate();
 		} else { // there exists an old file and a new one has just been
 					// downloaded
 			try {
@@ -82,15 +107,13 @@ public class CheckTDX implements Job {
 
 			// pass it forward to data extraction part
 			if (hasUpdate) {
-				checker.handleUpdate(path1);
+				System.out.println("handling " + path1);
+				System.out.print(checker);
+				handleUpdate();
 			}
 
 		}
 
-	}
-
-	public void setChecker(UpdateChecker updateChecker) {
-		this.checker = updateChecker;
 	}
 
 	// check if malformed or incompletely downloaded
@@ -184,7 +207,7 @@ public class CheckTDX implements Job {
 	}
 
 	private void compareSize(ZipFile zip1, ZipFile zip2) {
-		if (zip1.size() != zip2.size() || zip2 == null) {
+		if (zip1.size() != zip2.size()) {
 			hasUpdate = true;
 		}
 	}
@@ -220,5 +243,20 @@ public class CheckTDX implements Job {
 
 		return map;
 	}
+	
+	// handle extraction of new file
+		public void handleUpdate() {
+			// save timestamp of new update/version of data
+			System.out.println("setting context attributes");
+			Calendar c = Calendar.getInstance(TimeZone.getTimeZone(timezone));
+			Path p = Paths.get(path1);
+			FileHandler fileHandler = new DataHandler();
+			if (hasUpdate) {
+				ctx.setAttribute("mostRecentData", fileHandler.extractData(p.toFile()));
+			} else {
+				ctx.setAttribute("mostRecentData", p.toFile());
+			}
+			ctx.setAttribute("timeOfRetrieval", c);
+		}
 
 }

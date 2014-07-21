@@ -1,7 +1,5 @@
 package logic;
 
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Calendar;
 import java.util.TimeZone;
 
@@ -20,40 +18,40 @@ import org.quartz.Trigger;
 import org.quartz.TriggerBuilder;
 import org.quartz.impl.StdSchedulerFactory;
 
-import extractor.DataHandler;
-import extractor.FileHandler;
-
 @WebListener
 public class UpdateChecker implements ServletContextListener {
+	
+	private static final String TIME_ZONE = "Australia/Sydney"; // can change this
+	private static Calendar c = Calendar.getInstance(TimeZone
+			.getTimeZone(TIME_ZONE)); // used for storing time of last update
+	private static final int UPDATE_HOUR = c.get(Calendar.HOUR); // set these two values
+	private static final int UPDATE_MIN = c.get(Calendar.MINUTE) + 1;
 
-	private static final int UPDATE_HOUR = 2; // set these two values
-	private static final int UPDATE_MIN = 27;
-	private static final String TIME_ZONE = "Australia/Sydney"; // can change
-																// this
-	private static Calendar c; // used for storing time of last update
 	private static Scheduler scheduler;
-	private static FileHandler fileHandler = new DataHandler();
 	private static ServletContext ctx;
 
 	// used for testing
 	public void checkForUpdates() {
 		CheckTDX task = new CheckTDX();
-		task.setChecker(this);
 
 		SchedulerFactory factory = new StdSchedulerFactory();
 		try {
 			System.out.println("creating new job");
 			JobDetail job = JobBuilder.newJob(task.getClass())
 					.withIdentity("checkTDX", "group1").build();
+			job.getJobDataMap().put("context", ctx);
+			job.getJobDataMap().put("timezone", TIME_ZONE);
 			System.out.println("done!");
 
 			System.out.println("creating trigger for the job");
+			System.out.println("task set to be run at " + UPDATE_HOUR + ":" + UPDATE_MIN + " every day");
 			Trigger trigger = TriggerBuilder
 					.newTrigger()
 					.withIdentity("trigger1", "group1")
 					.withSchedule(
 							CronScheduleBuilder
-									.dailyAtHourAndMinute(UPDATE_HOUR, UPDATE_MIN)
+									.dailyAtHourAndMinute(UPDATE_HOUR,
+											UPDATE_MIN)
 									.inTimeZone(TimeZone.getTimeZone(TIME_ZONE))
 									.withMisfireHandlingInstructionFireAndProceed())
 					.forJob("checkTDX", "group1").build();
@@ -86,16 +84,6 @@ public class UpdateChecker implements ServletContextListener {
 		} catch (SchedulerException e) {
 			e.printStackTrace();
 		}
-	}
-
-	// handle extraction of new file
-	public void handleUpdate(String path) {
-		// save timestamp of new update/version of data
-		System.out.println("setting context attributes");
-		c = Calendar.getInstance(TimeZone.getTimeZone(TIME_ZONE));
-		Path p = Paths.get(path);
-		ctx.setAttribute("mostRecentData", fileHandler.extractData(p.toFile()));
-		ctx.setAttribute("timeOfRetrieval", c);
 	}
 
 }
