@@ -1,12 +1,11 @@
 package test;
 
-import Intermediary.UpdateChecker;
+import logic.UpdateChecker;
 
 public class TestMain {
 
-	/**
-	 * @param args
-	 */
+	// this is only to test the download/scheduling function
+	// without needing a server
 	public static void main(String[] args) {
 		UpdateChecker checker = new UpdateChecker();
 		checker.checkForUpdates();
