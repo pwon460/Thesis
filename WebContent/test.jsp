@@ -7,7 +7,7 @@
 <title>for testing purposes</title>
 </head>
 <body>
-<p>${status}</p>
+<a href="${status}" title="test">${status}</a>
 <p>${timestamp}</p>
 </body>
 </html>

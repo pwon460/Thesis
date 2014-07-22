@@ -20,12 +20,15 @@ import org.quartz.impl.StdSchedulerFactory;
 
 @WebListener
 public class UpdateChecker implements ServletContextListener {
-	
-	private static final String TIME_ZONE = "Australia/Sydney"; // can change this
+
+	// change the timezone as appropriate
+	private static final String TIME_ZONE = "Australia/Sydney";
 	private static Calendar c = Calendar.getInstance(TimeZone
 			.getTimeZone(TIME_ZONE)); // used for storing time of last update
-	private static final int UPDATE_HOUR = c.get(Calendar.HOUR); // set these two values
-	private static final int UPDATE_MIN = c.get(Calendar.MINUTE) + 1;
+	// change these two values for implementation
+	// these preset values were used for testing purposes
+	private static final int UPDATE_HOUR = c.get(Calendar.HOUR_OF_DAY); 
+	private static final int UPDATE_MIN = (c.get(Calendar.MINUTE) + 1) % 60;
 
 	private static Scheduler scheduler;
 	private static ServletContext ctx;
@@ -44,7 +47,8 @@ public class UpdateChecker implements ServletContextListener {
 			System.out.println("done!");
 
 			System.out.println("creating trigger for the job");
-			System.out.println("task set to be run at " + UPDATE_HOUR + ":" + UPDATE_MIN + " every day");
+			System.out.println("task set to be run at " + UPDATE_HOUR + ":"
+					+ UPDATE_MIN + " every day");
 			Trigger trigger = TriggerBuilder
 					.newTrigger()
 					.withIdentity("trigger1", "group1")

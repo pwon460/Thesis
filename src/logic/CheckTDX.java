@@ -47,18 +47,19 @@ public class CheckTDX implements Job {
 	public void execute(JobExecutionContext context)
 			throws JobExecutionException {
 		System.out.println("executing task");
-	    JobDataMap dataMap = context.getJobDetail().getJobDataMap();
-	    ctx = (ServletContext) dataMap.get("context");
-	    timezone = dataMap.getString("timezone");
-	
-	    if (ctx == null) {
-	    	System.err.println("context unable to be initialized");
-	    } else if (timezone == null) {
-	    	System.err.println("timezone unable to be obtained");
-	    }
-	    
-		hasUpdate = false; // reset state before downloading, assume there is no update to start with
-		
+		JobDataMap dataMap = context.getJobDetail().getJobDataMap();
+		ctx = (ServletContext) dataMap.get("context");
+		timezone = dataMap.getString("timezone");
+
+		if (ctx == null) {
+			System.err.println("context unable to be initialized");
+		} else if (timezone == null) {
+			System.err.println("timezone unable to be obtained");
+		}
+
+		hasUpdate = false; // reset state before downloading, assume there is no
+							// update to start with
+
 		System.out.println("downloading file from tdx");
 		downloadZip(); // download file from TDX and save it as temp.zip
 
@@ -152,7 +153,8 @@ public class CheckTDX implements Job {
 					System.out.println("malformed zip detected, overwriting");
 					System.out.println("saving to " + path1);
 				}
-			} else { // otherwise save as temp - ie. first data pull from tdx server
+			} else { // otherwise save as temp - ie. first data pull from tdx
+						// server
 				path1 = file.getCanonicalPath();
 			}
 
@@ -243,20 +245,21 @@ public class CheckTDX implements Job {
 
 		return map;
 	}
-	
+
 	// handle extraction of new file
-		public void handleUpdate() {
-			// save timestamp of new update/version of data
-			System.out.println("setting context attributes");
-			Calendar c = Calendar.getInstance(TimeZone.getTimeZone(timezone));
-			Path p = Paths.get(path1);
-			FileHandler fileHandler = new DataHandler();
-			if (hasUpdate) {
-				ctx.setAttribute("mostRecentData", fileHandler.extractData(p.toFile()));
-			} else {
-				ctx.setAttribute("mostRecentData", p.toFile());
-			}
-			ctx.setAttribute("timeOfRetrieval", c);
+	public void handleUpdate() {
+		// save timestamp of new update/version of data
+		System.out.println("setting context attributes");
+		Calendar c = Calendar.getInstance(TimeZone.getTimeZone(timezone));
+		Path p = Paths.get(path1);
+		FileHandler fileHandler = new DataHandler();
+		if (hasUpdate) {
+			ctx.setAttribute("mostRecentData",
+					fileHandler.extractData(p.toFile()));
+		} else {
+			ctx.setAttribute("mostRecentData", p.toFile());
 		}
+		ctx.setAttribute("timeOfRetrieval", c);
+	}
 
 }

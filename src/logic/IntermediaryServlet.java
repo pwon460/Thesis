@@ -36,18 +36,18 @@ public class IntermediaryServlet extends HttpServlet {
 		TDXFile = (File) getServletContext().getAttribute("mostRecentData");
 		c = (Calendar) getServletContext().getAttribute("timeOfRetrieval");
 
-		// if (TDXFile == null || c == null) {
-		if (c == null) { // file will be null as filehandler not implemented...
+		 if (TDXFile == null || c == null) {
 			// handle with error message
 			String msg = "Server error, please check again later for updates";
 			request.setAttribute("status", msg);
 		} else {
 			// TODO: version check goes here, maybe phone will send version/date
 			// send url of file to phone, but for now just displaying it to jsp
-			URL url = new URL(request.getScheme(), request.getServerName(),
-					request.getServerPort(), request.getContextPath());
-			request.setAttribute("status", url.toExternalForm()); // TODO: url should actually be url + file
-			request.setAttribute("timestamp", c.get(Calendar.HOUR) + ":" + c.get(Calendar.MINUTE));
+//			URL url = new URL(request.getScheme(), request.getServerName(),
+//					request.getServerPort(), request.getContextPath());
+			request.setAttribute("status", TDXFile.getAbsolutePath());
+			request.setAttribute("timestamp",
+					c.get(Calendar.HOUR) + ":" + c.get(Calendar.MINUTE));
 		}
 
 		rd.forward(request, response);
