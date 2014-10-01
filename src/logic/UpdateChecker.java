@@ -36,6 +36,7 @@ public class UpdateChecker implements ServletContextListener {
 	// used for testing
 	public void checkForUpdates() {
 		CheckTDX task = new CheckTDX();
+		task.setDownloadPath(ctx.getRealPath(""));
 
 		SchedulerFactory factory = new StdSchedulerFactory();
 		try {

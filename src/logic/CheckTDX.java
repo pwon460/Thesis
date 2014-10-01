@@ -34,13 +34,37 @@ import static java.nio.file.StandardCopyOption.*;
 public class CheckTDX implements Job {
 
 	private static boolean hasUpdate = false;
-	private UpdateChecker checker = null;
-	private static String current = System.getProperty("user.dir");
+	private static String current;
 	private static String path1 = ""; // variable for file that app users will
 										// receive
 	private static String path2 = ""; // newly downloaded file is assigned here
 	private static ServletContext ctx;
 	private static String timezone;
+
+	public CheckTDX() {
+		
+	}
+	
+	public void setDownloadPath (String realPath) {
+		String folderName = "Downloads";
+		File file = new File(realPath, folderName);
+
+		System.out.println("creating downloads folder at " + file.getAbsolutePath());
+		if (!file.exists()) {
+			try {
+				file.mkdir();
+				System.out.println("successfully created 'Downloads' directory");
+			} catch (SecurityException se) {
+				System.err
+						.println("security exception error, unable to create downloads folder");
+			}
+		} else {
+			System.out.println("directory already exists");
+		}
+
+		current = file.getAbsolutePath();
+		System.out.println("current path = " + current);
+	}
 
 	@Override
 	// public void run() {
@@ -76,7 +100,7 @@ public class CheckTDX implements Job {
 		if (path2.equals("")) {
 			System.out.println("handling " + path1);
 			hasUpdate = true;
-			handleUpdate();
+			handleFile();
 		} else { // there exists an old file and a new one has just been
 					// downloaded
 			try {
@@ -106,12 +130,8 @@ public class CheckTDX implements Job {
 				e.printStackTrace();
 			}
 
-			// pass it forward to data extraction part
-			if (hasUpdate) {
-				System.out.println("handling " + path1);
-				System.out.print(checker);
-				handleUpdate();
-			}
+			System.out.println("handling " + path1);
+			handleFile();
 
 		}
 
@@ -119,18 +139,21 @@ public class CheckTDX implements Job {
 
 	// check if malformed or incompletely downloaded
 	private boolean isZipMalformed(String path) {
-		boolean isValid = false;
+		boolean isMalformed = false;
 
+		System.out.println("path = " + path);
 		try {
 			ZipFile zip = new ZipFile(new File(path));
 			zip.close();
 		} catch (ZipException e) {
-			isValid = true;
+			System.err.println("zip exception");
+			isMalformed = true;
 		} catch (IOException e) {
-			isValid = true;
+			System.err.println("zip io exception");
+			isMalformed = true;
 		}
 
-		return isValid;
+		return isMalformed;
 	}
 
 	private void downloadZip() {
@@ -247,7 +270,7 @@ public class CheckTDX implements Job {
 	}
 
 	// handle extraction of new file
-	public void handleUpdate() {
+	public void handleFile() {
 		// save timestamp of new update/version of data
 		System.out.println("setting context attributes");
 		Calendar c = Calendar.getInstance(TimeZone.getTimeZone(timezone));

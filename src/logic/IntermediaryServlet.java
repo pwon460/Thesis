@@ -2,10 +2,12 @@ package logic;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Calendar;
 
 import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -36,16 +38,25 @@ public class IntermediaryServlet extends HttpServlet {
 		TDXFile = (File) getServletContext().getAttribute("mostRecentData");
 		c = (Calendar) getServletContext().getAttribute("timeOfRetrieval");
 
-		 if (TDXFile == null || c == null) {
+		if (TDXFile == null || c == null) {
 			// handle with error message
-			String msg = "Server error, please check again later for updates";
+			String msg = "please check again later for updates";
 			request.setAttribute("status", msg);
 		} else {
 			// TODO: version check goes here, maybe phone will send version/date
 			// send url of file to phone, but for now just displaying it to jsp
-//			URL url = new URL(request.getScheme(), request.getServerName(),
-//					request.getServerPort(), request.getContextPath());
-			request.setAttribute("status", TDXFile.getAbsolutePath());
+			ServletContext ctx = getServletContext();
+			
+//			StringBuffer requestURL = request.getRequestURL();
+//			URL url = new URL(requestURL.toString());
+
+			URL resURL = ctx.getResource("/Downloads/temp.zip");
+
+			String path = resURL.getPath();
+			String[] array = path.split("^/\\w+", 2);
+			path = array[1];
+			
+			request.setAttribute("status", path);
 			request.setAttribute("timestamp",
 					c.get(Calendar.HOUR) + ":" + c.get(Calendar.MINUTE));
 		}
