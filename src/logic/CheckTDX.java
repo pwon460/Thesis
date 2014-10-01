@@ -184,7 +184,7 @@ public class CheckTDX implements Job {
 				path1 = file.getCanonicalPath();
 			}
 
-//			downloadFile(input, file);
+			downloadFile(input, file);
 			input.close();
 			System.out.println("done!");
 
