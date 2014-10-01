@@ -1,5 +1,7 @@
 package logic;
 
+import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -29,8 +31,6 @@ import org.quartz.JobExecutionException;
 import extractor.DataHandler;
 import extractor.FileHandler;
 
-import static java.nio.file.StandardCopyOption.*;
-
 public class CheckTDX implements Job {
 
 	private static boolean hasUpdate = false;
@@ -42,18 +42,20 @@ public class CheckTDX implements Job {
 	private static String timezone;
 
 	public CheckTDX() {
-		
+
 	}
-	
-	public void setDownloadPath (String realPath) {
+
+	public void setDownloadPath(String realPath) {
 		String folderName = "Downloads";
 		File file = new File(realPath, folderName);
 
-		System.out.println("creating downloads folder at " + file.getAbsolutePath());
+		System.out.println("creating downloads folder at "
+				+ file.getAbsolutePath());
 		if (!file.exists()) {
 			try {
 				file.mkdir();
-				System.out.println("successfully created 'Downloads' directory");
+				System.out
+						.println("successfully created 'Downloads' directory");
 			} catch (SecurityException se) {
 				System.err
 						.println("security exception error, unable to create downloads folder");
@@ -276,13 +278,33 @@ public class CheckTDX implements Job {
 		Calendar c = Calendar.getInstance(TimeZone.getTimeZone(timezone));
 		Path p = Paths.get(path1);
 		FileHandler fileHandler = new DataHandler();
+		File extracted = null;
+
 		if (hasUpdate) {
-			ctx.setAttribute("mostRecentData",
-					fileHandler.extractData(p.toFile()));
+			extracted = fileHandler.extractData(p.toFile());
 		} else {
-			ctx.setAttribute("mostRecentData", p.toFile());
+			extracted = fileHandler.getExtractedData();
 		}
+
+		Path pathToCopy = copyToCurrentPath(extracted);
+		ctx.setAttribute("mostRecentData", pathToCopy);
 		ctx.setAttribute("timeOfRetrieval", c);
+	}
+
+	private Path copyToCurrentPath(File file) {
+		Path p = null;
+		String fileName = file.getName();
+		String newFileName = current + System.getProperty("file.separator")
+				+ fileName;
+		File temp = new File(newFileName);
+		try {
+			p = Files.copy(file.toPath(), temp.toPath(), REPLACE_EXISTING);
+		} catch (IOException e) {
+			System.err.println("io exception encountered");
+			e.printStackTrace();
+		}
+
+		return p;
 	}
 
 }

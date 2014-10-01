@@ -8,20 +8,22 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 
 public class DataHandler implements FileHandler {
-	private File data;
+	
+	private String TEST_FILE = "test.txt";
 
 	public File getExtractedData() {
-		return data;
+		File newFile = new File(TEST_FILE);
+		return newFile;
 	}
 
 	@Override
 	public File extractData(File raw) {
-		File newFile = new File("test");
+		File newFile = new File(TEST_FILE);
 
 		try {
 			BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(
 					new FileOutputStream(newFile)));
-			writer.write("hi, this is to simulate a 'handled' file");
+			writer.write("hello world!");
 			writer.close();
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
