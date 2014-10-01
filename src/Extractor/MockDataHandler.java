@@ -6,19 +6,37 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
+import java.util.Calendar;
 
-public class DataHandler implements FileHandler {
+public class MockDataHandler implements FileHandler {
 	
-	private String TEST_FILE = "test.txt";
+	private String testFile;
 
+	public MockDataHandler() {
+		Calendar cal = Calendar.getInstance();
+		StringBuilder sb = new StringBuilder();
+		sb.append(cal.get(Calendar.YEAR));
+		sb.append("-");
+		int month = cal.get(Calendar.MONTH);
+		month++;
+		sb.append(month);
+		sb.append("-");
+		int dayOfMonth = cal.get(Calendar.DAY_OF_MONTH);
+		if (dayOfMonth < 10) {
+			sb.append("0");	
+		}
+		sb.append(dayOfMonth);
+		testFile = sb.toString();
+	}
+	
+	@Override
 	public File getExtractedData() {
-		File newFile = new File(TEST_FILE);
-		return newFile;
+		return extractData(null);
 	}
 
 	@Override
 	public File extractData(File raw) {
-		File newFile = new File(TEST_FILE);
+		File newFile = new File(testFile);
 
 		try {
 			BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(
@@ -33,4 +51,5 @@ public class DataHandler implements FileHandler {
 		
 		return newFile;
 	}
+	
 }

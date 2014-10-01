@@ -48,9 +48,6 @@ public class IntermediaryServlet extends HttpServlet {
 			// send url of file to phone, but for now just displaying it to jsp
 			ServletContext ctx = getServletContext();
 
-			// StringBuffer requestURL = request.getRequestURL();
-			// URL url = new URL(requestURL.toString());
-			System.out.println(TDXData.getFileName().toString());
 			URL resURL = ctx.getResource("/Downloads/"
 					+ TDXData.getFileName().toString());
 

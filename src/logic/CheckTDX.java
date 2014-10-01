@@ -3,6 +3,7 @@ package logic;
 import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -28,7 +29,7 @@ import org.quartz.JobDataMap;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 
-import extractor.DataHandler;
+import extractor.MockDataHandler;
 import extractor.FileHandler;
 
 public class CheckTDX implements Job {
@@ -183,16 +184,7 @@ public class CheckTDX implements Job {
 				path1 = file.getCanonicalPath();
 			}
 
-			OutputStream output = new FileOutputStream(file);
-
-			int read = 0;
-			byte[] bytes = new byte[1024];
-
-			while ((read = input.read(bytes)) != -1) {
-				output.write(bytes, 0, read);
-			}
-
-			output.close();
+//			downloadFile(input, file);
 			input.close();
 			System.out.println("done!");
 
@@ -201,6 +193,20 @@ public class CheckTDX implements Job {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+	}
+
+	private void downloadFile(InputStream input, File file)
+			throws FileNotFoundException, IOException {
+		OutputStream output = new FileOutputStream(file);
+
+		int read = 0;
+		byte[] bytes = new byte[1024];
+
+		while ((read = input.read(bytes)) != -1) {
+			output.write(bytes, 0, read);
+		}
+
+		output.close();
 	}
 
 	private void handleZip2() throws IOException {
@@ -277,7 +283,7 @@ public class CheckTDX implements Job {
 		System.out.println("setting context attributes");
 		Calendar c = Calendar.getInstance(TimeZone.getTimeZone(timezone));
 		Path p = Paths.get(path1);
-		FileHandler fileHandler = new DataHandler();
+		FileHandler fileHandler = new MockDataHandler();
 		File extracted = null;
 
 		if (hasUpdate) {
@@ -291,14 +297,15 @@ public class CheckTDX implements Job {
 		ctx.setAttribute("timeOfRetrieval", c);
 	}
 
-	private Path copyToCurrentPath(File file) {
+	private Path copyToCurrentPath(File fileToCopy) {
 		Path p = null;
-		String fileName = file.getName();
+		String fileName = fileToCopy.getName();
 		String newFileName = current + System.getProperty("file.separator")
 				+ fileName;
 		File temp = new File(newFileName);
+		
 		try {
-			p = Files.copy(file.toPath(), temp.toPath(), REPLACE_EXISTING);
+			p = Files.copy(fileToCopy.toPath(), temp.toPath(), REPLACE_EXISTING);
 		} catch (IOException e) {
 			System.err.println("io exception encountered");
 			e.printStackTrace();
