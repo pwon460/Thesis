@@ -11,6 +11,7 @@ import java.io.OutputStream;
 import java.net.Authenticator;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.UnknownHostException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -29,11 +30,13 @@ import org.quartz.JobDataMap;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 
-import extractor.MockDataHandler;
 import extractor.FileHandler;
+import extractor.MockDataHandler;
 
 public class CheckTDX implements Job {
 
+	private static final String TDX_FILE_FORMAT = "\\d{4}-\\d{2}-\\d{2}\\.txt";
+	private static final int RETRY_TIME = 60000;
 	private static boolean hasUpdate = false;
 	private static String current;
 	private static String path1 = ""; // variable for file that app users will
@@ -187,9 +190,15 @@ public class CheckTDX implements Job {
 			downloadFile(input, file);
 			input.close();
 			System.out.println("done!");
-
-		} catch (MalformedURLException e1) {
-			e1.printStackTrace();
+		} catch (UnknownHostException e) {
+			try {
+				Thread.sleep(RETRY_TIME);
+				downloadZip();
+			} catch (InterruptedException e1) {
+				e1.printStackTrace();
+			}
+		} catch (MalformedURLException e) {
+			e.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -292,9 +301,22 @@ public class CheckTDX implements Job {
 			extracted = fileHandler.getExtractedData();
 		}
 
+		removeOldFilesFromCurrentPath();
 		Path pathToCopy = copyToCurrentPath(extracted);
 		ctx.setAttribute("mostRecentData", pathToCopy);
 		ctx.setAttribute("timeOfRetrieval", c);
+	}
+
+	private void removeOldFilesFromCurrentPath() {
+		File currDir = new File(current);
+		File[] filesArray = currDir.listFiles();
+		for (File f: filesArray) {
+//			System.out.println("file looked at = " + f.getName());
+			if (f.getName().matches(TDX_FILE_FORMAT)) {
+//				System.out.println("removing old file " + f.getName());
+				f.delete();
+			}
+		}
 	}
 
 	private Path copyToCurrentPath(File fileToCopy) {

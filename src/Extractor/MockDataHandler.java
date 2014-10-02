@@ -26,6 +26,7 @@ public class MockDataHandler implements FileHandler {
 			sb.append("0");	
 		}
 		sb.append(dayOfMonth);
+		sb.append(".txt");
 		testFile = sb.toString();
 	}
 	

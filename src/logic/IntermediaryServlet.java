@@ -1,10 +1,9 @@
 package logic;
 
-import java.io.File;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.net.URL;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Calendar;
 
 import javax.servlet.RequestDispatcher;
@@ -39,10 +38,16 @@ public class IntermediaryServlet extends HttpServlet {
 		TDXData = (Path) getServletContext().getAttribute("mostRecentData");
 		c = (Calendar) getServletContext().getAttribute("timeOfRetrieval");
 
+		// handle with error message
 		if (TDXData == null || c == null) {
-			// handle with error message
-			String msg = "please check again later for updates";
-			request.setAttribute("status", msg);
+			response.setHeader("status", "error");
+			response.setContentType("text/html");
+			
+			PrintWriter writer = response.getWriter();
+			writer.write("<p>Please wait... </p>");
+			
+//			String msg = "please check again later for updates";
+//			request.setAttribute("status", msg);
 		} else {
 			// TODO: version check goes here, maybe phone will send version/date
 			// send url of file to phone, but for now just displaying it to jsp
@@ -56,13 +61,18 @@ public class IntermediaryServlet extends HttpServlet {
 			String[] array = path.split("^/\\w+", 2);
 			path = array[1];
 
-			request.setAttribute("status", path);
-			request.setAttribute("timestamp",
-					c.get(Calendar.HOUR) + ":" + c.get(Calendar.MINUTE));
+			response.setHeader("status", "ready");
+			response.setContentType("text/html");
+			
+			PrintWriter writer = response.getWriter();
+			writer.write("<p>" + path + "</p>");
+			
+//			request.setAttribute("status", path);
+//			request.setAttribute("timestamp",
+//					c.get(Calendar.HOUR) + ":" + c.get(Calendar.MINUTE));
 		}
 
-		rd.forward(request, response);
-
+//		rd.forward(request, response);
 	}
 
 	/**
