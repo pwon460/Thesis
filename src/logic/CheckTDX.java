@@ -35,7 +35,7 @@ import extractor.MockDataHandler;
 
 public class CheckTDX implements Job {
 
-	private static final String TDX_FILE_FORMAT = "\\d{4}-\\d{2}-\\d{2}\\.txt";
+	private static final String TDX_FILE_FORMAT = "simo\\.\\d{8}\\.zip";
 	private static final int RETRY_TIME = 60000;
 	private static boolean hasUpdate = false;
 	private static String current;
@@ -187,7 +187,7 @@ public class CheckTDX implements Job {
 				path1 = file.getCanonicalPath();
 			}
 
-			downloadFile(input, file);
+//			downloadFile(input, file);
 			input.close();
 			System.out.println("done!");
 		} catch (UnknownHostException e) {
@@ -302,8 +302,8 @@ public class CheckTDX implements Job {
 		}
 
 		removeOldFilesFromCurrentPath();
-		Path pathToCopy = copyToCurrentPath(extracted);
-		ctx.setAttribute("mostRecentData", pathToCopy);
+//		Path pathToCopy = copyToCurrentPath(extracted);
+		ctx.setAttribute("mostRecentData", extracted.toPath());
 		ctx.setAttribute("timeOfRetrieval", c);
 	}
 
@@ -319,21 +319,21 @@ public class CheckTDX implements Job {
 		}
 	}
 
-	private Path copyToCurrentPath(File fileToCopy) {
-		Path p = null;
-		String fileName = fileToCopy.getName();
-		String newFileName = current + System.getProperty("file.separator")
-				+ fileName;
-		File temp = new File(newFileName);
-		
-		try {
-			p = Files.copy(fileToCopy.toPath(), temp.toPath(), REPLACE_EXISTING);
-		} catch (IOException e) {
-			System.err.println("io exception encountered");
-			e.printStackTrace();
-		}
-
-		return p;
-	}
+//	private Path copyToCurrentPath(File fileToCopy) {
+//		Path p = null;
+//		String fileName = fileToCopy.getName();
+//		String newFileName = current + System.getProperty("file.separator")
+//				+ fileName;
+//		File temp = new File(newFileName);
+//		
+//		try {
+//			p = Files.copy(fileToCopy.toPath(), temp.toPath(), REPLACE_EXISTING);
+//		} catch (IOException e) {
+//			System.err.println("io exception encountered");
+//			e.printStackTrace();
+//		}
+//
+//		return p;
+//	}
 
 }
