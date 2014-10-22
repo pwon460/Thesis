@@ -30,8 +30,8 @@ import org.quartz.JobDataMap;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 
-import extractor.FileHandler;
-import extractor.MockDataHandler;
+import Extractor.FileHandler;
+import Extractor.MockDataHandler;
 
 public class CheckTDX implements Job {
 
