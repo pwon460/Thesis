@@ -8,6 +8,5 @@
 </head>
 <body>
 <a href="${status}" title="test">${status}</a>
-<p>${timestamp}</p>
 </body>
 </html>
