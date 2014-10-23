@@ -7,7 +7,6 @@ import java.net.URL;
 import java.nio.file.Path;
 import java.util.ArrayList;
 
-import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -33,7 +32,7 @@ public class IntermediaryServlet extends HttpServlet {
 	 */
 	protected void doGet(HttpServletRequest request,
 			HttpServletResponse response) throws ServletException, IOException {
-		RequestDispatcher rd = request.getRequestDispatcher("/test.jsp");
+//		RequestDispatcher rd = request.getRequestDispatcher("/test.jsp");
 		// there's potential that the file hasn't been finished downloaded yet
 		TDXData = (ArrayList<Path>) getServletContext().getAttribute(
 				"mostRecentData");

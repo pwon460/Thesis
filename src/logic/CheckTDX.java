@@ -16,10 +16,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Enumeration;
 import java.util.HashMap;
-import java.util.TimeZone;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipException;
 import java.util.zip.ZipFile;
@@ -31,12 +29,11 @@ import org.quartz.JobDataMap;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 
-import Extractor.FileHandler;
-import Extractor.MockDataHandler;
+import extractor.FileHandler;
+import extractor.MockDataHandler;
 
 public class CheckTDX implements Job {
 
-	private static final String TDX_FILE_FORMAT = "simo\\.\\d{8}\\.zip";
 	private static final int RETRY_TIME = 60000;
 	private static boolean hasUpdate = false;
 	private static String current;
@@ -188,7 +185,7 @@ public class CheckTDX implements Job {
 				path1 = file.getCanonicalPath();
 			}
 
-//			downloadFile(input, file);
+			downloadFile(input, file);
 			input.close();
 			System.out.println("done!");
 		} catch (UnknownHostException e) {
