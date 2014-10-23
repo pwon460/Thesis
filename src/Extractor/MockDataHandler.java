@@ -1,4 +1,4 @@
-package extractor;
+package Extractor;
 
 import java.io.File;
 import java.util.ArrayList;
