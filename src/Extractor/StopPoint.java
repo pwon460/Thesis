@@ -1,4 +1,4 @@
-package Extractor;
+package extractor;
 /**
  * Store stop information that is under a StopPoint tag.
  * stopID: <AtcoCode> reference id of a stop

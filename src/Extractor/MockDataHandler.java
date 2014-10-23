@@ -1,11 +1,14 @@
-package Extractor;
+package extractor;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Calendar;
 
 public class MockDataHandler implements FileHandler {
 	
-	private String testFile;
+	private String testFile1;
+	private String testFile2;
+	private String testFile3;
 
 	public MockDataHandler() {
 		Calendar cal = Calendar.getInstance();
@@ -21,30 +24,27 @@ public class MockDataHandler implements FileHandler {
 		}
 		sb.append(dayOfMonth);
 		sb.append(".zip");
-		testFile = sb.toString();
+		testFile1 = sb.toString();
+		testFile2 = "simo.init.zip";
+		testFile3 = "simo.patch.20140912.zip";
 	}
 	
 	@Override
-	public File getExtractedData() {
+	public ArrayList<File> getExtractedData() {
 		return extractData(null);
 	}
 
 	@Override
-	public File extractData(File raw) {
-		File newFile = new File(testFile);
+	public ArrayList<File> extractData(File raw) {
+		ArrayList<File> fileList = new ArrayList<File>();
+		File newFile = new File(testFile1);
+		File newFile2 = new File(testFile2);
+		File newFile3 = new File(testFile3);
 
-//		try {
-//			BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(
-//					new FileOutputStream(newFile)));
-//			writer.write("hello world!");
-//			writer.close();
-//		} catch (FileNotFoundException e) {
-//			e.printStackTrace();
-//		} catch (IOException e) {
-//			e.printStackTrace();
-//		}
-		
-		return newFile;
+		fileList.add(newFile);
+		fileList.add(newFile2);
+		fileList.add(newFile3);
+		return fileList;
 	}
 	
 }

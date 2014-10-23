@@ -1,4 +1,4 @@
-package Extractor;
+package extractor;
 import java.util.ArrayList;
 
 

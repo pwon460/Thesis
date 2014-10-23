@@ -15,10 +15,9 @@ import java.net.UnknownHostException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Calendar;
+import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashMap;
-import java.util.TimeZone;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipException;
 import java.util.zip.ZipFile;
@@ -30,12 +29,11 @@ import org.quartz.JobDataMap;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 
-import Extractor.FileHandler;
-import Extractor.MockDataHandler;
+import extractor.FileHandler;
+import extractor.MockDataHandler;
 
 public class CheckTDX implements Job {
 
-	private static final String TDX_FILE_FORMAT = "simo\\.\\d{8}\\.zip";
 	private static final int RETRY_TIME = 60000;
 	private static boolean hasUpdate = false;
 	private static String current;
@@ -187,7 +185,7 @@ public class CheckTDX implements Job {
 				path1 = file.getCanonicalPath();
 			}
 
-//			downloadFile(input, file);
+			downloadFile(input, file);
 			input.close();
 			System.out.println("done!");
 		} catch (UnknownHostException e) {
@@ -290,50 +288,22 @@ public class CheckTDX implements Job {
 	public void handleFile() {
 		// save timestamp of new update/version of data
 		System.out.println("setting context attributes");
-		Calendar c = Calendar.getInstance(TimeZone.getTimeZone(timezone));
 		Path p = Paths.get(path1);
 		FileHandler fileHandler = new MockDataHandler();
-		File extracted = null;
+		ArrayList<File> extracted = null;
 
 		if (hasUpdate) {
 			extracted = fileHandler.extractData(p.toFile());
 		} else {
 			extracted = fileHandler.getExtractedData();
 		}
-
-		removeOldFilesFromCurrentPath();
-//		Path pathToCopy = copyToCurrentPath(extracted);
-		ctx.setAttribute("mostRecentData", extracted.toPath());
-		ctx.setAttribute("timeOfRetrieval", c);
-	}
-
-	private void removeOldFilesFromCurrentPath() {
-		File currDir = new File(current);
-		File[] filesArray = currDir.listFiles();
-		for (File f: filesArray) {
-//			System.out.println("file looked at = " + f.getName());
-			if (f.getName().matches(TDX_FILE_FORMAT)) {
-//				System.out.println("removing old file " + f.getName());
-				f.delete();
-			}
+		
+		ArrayList<Path> filePaths = new ArrayList<Path>();
+		for (File f : extracted) {
+			filePaths.add(f.toPath());
 		}
-	}
 
-//	private Path copyToCurrentPath(File fileToCopy) {
-//		Path p = null;
-//		String fileName = fileToCopy.getName();
-//		String newFileName = current + System.getProperty("file.separator")
-//				+ fileName;
-//		File temp = new File(newFileName);
-//		
-//		try {
-//			p = Files.copy(fileToCopy.toPath(), temp.toPath(), REPLACE_EXISTING);
-//		} catch (IOException e) {
-//			System.err.println("io exception encountered");
-//			e.printStackTrace();
-//		}
-//
-//		return p;
-//	}
+		ctx.setAttribute("mostRecentData", filePaths);
+	}
 
 }
