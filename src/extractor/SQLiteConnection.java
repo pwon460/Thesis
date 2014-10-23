@@ -1,8 +1,6 @@
 package extractor;
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -13,18 +11,18 @@ import java.sql.ResultSet;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Collections;
 import java.util.Comparator;
 
 
 public class SQLiteConnection {
-
+	
+	final static String DATABASE_PATH = "jdbc:sqlite:/Thesis/server2.db";
+	final static String DATA_FILE_DIR = "/Thesis/Downloads/";
 	// Table names.
 	// Table names are decided considering dropping order of tables to avoid any conflict.
 	final String STOPS = "STOPS";
@@ -83,14 +81,14 @@ public class SQLiteConnection {
 		Connection connection = null;
 		PreparedStatement stmt = null;
     	try{
-    		File file = new File("/Users/cse/Thesis/server2.db");
+    		File file = new File(DATABASE_PATH);
     		file.delete();
 		}catch(Exception e){
     		e.printStackTrace(); 
     	}
 		try {
 			Class.forName("org.sqlite.JDBC");
-			connection = DriverManager.getConnection("jdbc:sqlite:/Users/cse/Thesis/server2.db");
+			connection = DriverManager.getConnection(DATABASE_PATH);
 			connection.setAutoCommit(false);
 
 			// Create all tables
@@ -299,7 +297,7 @@ public class SQLiteConnection {
 		PreparedStatement stmt = null;
 		try {
 			Class.forName("org.sqlite.JDBC");
-			connection = DriverManager.getConnection("jdbc:sqlite:/Users/cse/Thesis/server2.db");
+			connection = DriverManager.getConnection(DATABASE_PATH);
 			connection.setAutoCommit(false);
 			String query = "INSERT OR IGNORE INTO " + this.DAYS_VARIATION
 					       + " (mon, tue, wed, thu, fri, sat, sun) VALUES (?, ?, ?, ?, ?, ?, ?)";
@@ -350,7 +348,7 @@ public class SQLiteConnection {
 
 	private boolean mapFileChecker() {
 		// if mapStop exists, assume the other map files also exist.
-		File f = new File("/Users/cse/Thesis/data/mapStop.txt");
+		File f = new File(DATA_FILE_DIR + "mapStop.txt");
 		if (f.exists()) {
 			return true;
 		} else {
@@ -362,7 +360,7 @@ public class SQLiteConnection {
 	    FileWriter out = null;
 
 		try {
-			out = new FileWriter("/Users/cse/Thesis/data/mapStop.txt");
+			out = new FileWriter(DATA_FILE_DIR + "mapStop.txt");
 		    for (int i : this.stopMap.keySet()) {
 		    	out.write(String.valueOf(i) + "," + String.valueOf(this.stopMap.get(i)) +"\n");
 		    }
@@ -378,7 +376,7 @@ public class SQLiteConnection {
 			}
 		}
 		try {
-			out = new FileWriter("/Users/cse/Thesis/data/mapRoute.txt");
+			out = new FileWriter(DATA_FILE_DIR + "mapRoute.txt");
 		    for (String i : this.routeMap.keySet()) {
 		    	out.write(i + "," + String.valueOf(this.routeMap.get(i)) + "\n");     
 		    }
@@ -394,7 +392,7 @@ public class SQLiteConnection {
 			}
 		}
 		try {
-			out = new FileWriter("/Users/cse/Thesis/data/mapSection.txt");
+			out = new FileWriter(DATA_FILE_DIR + "mapSection.txt");
 		    for (String i : this.sectionMap.keySet()) {
 		    	out.write(i + "," + String.valueOf(this.sectionMap.get(i)) + "\n");     
 		    }
@@ -410,7 +408,7 @@ public class SQLiteConnection {
 			}
 		}
 		try {
-			out = new FileWriter("/Users/cse/Thesis/data/mapPrivateCode.txt");
+			out = new FileWriter(DATA_FILE_DIR + "mapPrivateCode.txt");
 		    for (String i : this.privateMap.keySet()) {
 		    	out.write(i + "," + String.valueOf(this.privateMap.get(i)) + "\n");     
 		    }
@@ -432,7 +430,7 @@ public class SQLiteConnection {
 		String line = "";
 		String csvSplitBy = ",";
 		try {
-			br = new BufferedReader(new FileReader("/Users/Cse/Thesis/data/mapStop.txt"));
+			br = new BufferedReader(new FileReader(DATA_FILE_DIR + "mapStop.txt"));
 			while((line = br.readLine()) != null) {
 				String[] columns = line.split(csvSplitBy);
 				this.stopMap.put(Integer.valueOf(columns[0]), Integer.valueOf(columns[1]));
@@ -444,7 +442,7 @@ public class SQLiteConnection {
 			e.printStackTrace();
 		}
 		try {
-			br = new BufferedReader(new FileReader("/Users/Cse/Thesis/data/mapRoute.txt"));
+			br = new BufferedReader(new FileReader(DATA_FILE_DIR + "mapRoute.txt"));
 			line = "";
 			while((line = br.readLine()) != null) {
 				String[] columns = line.split(csvSplitBy);
@@ -457,7 +455,7 @@ public class SQLiteConnection {
 			e.printStackTrace();
 		}
 		try {
-			br = new BufferedReader(new FileReader("/Users/Cse/Thesis/data/mapSection.txt"));
+			br = new BufferedReader(new FileReader(DATA_FILE_DIR + "mapSection.txt"));
 			line = "";
 			while((line = br.readLine()) != null) {
 				String[] columns = line.split(csvSplitBy);
@@ -470,7 +468,7 @@ public class SQLiteConnection {
 			e.printStackTrace();
 		}
 		try {
-			br = new BufferedReader(new FileReader("/Users/cse/Thesis/data/mapPrivateCode.txt"));
+			br = new BufferedReader(new FileReader(DATA_FILE_DIR + "mapPrivateCode.txt"));
 			line = "";
 			while((line = br.readLine()) != null) {
 				String[] columns = line.split(csvSplitBy);
@@ -524,7 +522,7 @@ public class SQLiteConnection {
 		PreparedStatement stmt = null;
 		try {
 			Class.forName("org.sqlite.JDBC");
-			connection = DriverManager.getConnection("jdbc:sqlite:/Users/cse/Thesis/server2.db");
+			connection = DriverManager.getConnection(DATABASE_PATH);
 			connection.setAutoCommit(false);
 
 			String mode = service.getMode();
@@ -982,7 +980,7 @@ public class SQLiteConnection {
 	
 	public void makeInitialDataFile() {
 		// run shell script to generates initial database files
-		String command = "sh /Users/cse/Thesis/compareDatafiles.sh ";
+		String command = "sh /Thesis/compareDatafiles.sh ";
 		Process proc;
 		try {
 			proc = Runtime.getRuntime().exec(command);
@@ -995,7 +993,7 @@ public class SQLiteConnection {
 	
 	public void zipWeeklyFiles() {
 		// run shell script to zip weekly files
-		String command = "sh /Users/cse/Thesis/zipByDate.sh ";
+		String command = "sh /Thesis/zipByDate.sh ";
 		Process proc;
 		try {
 			proc = Runtime.getRuntime().exec(command);
@@ -1011,7 +1009,7 @@ public class SQLiteConnection {
 		PreparedStatement stmt = null;
 		try {
 			Class.forName("org.sqlite.JDBC");
-			connection = DriverManager.getConnection("jdbc:sqlite:/Users/cse/Thesis/server2.db");
+			connection = DriverManager.getConnection(DATABASE_PATH);
 			connection.setAutoCommit(false);
 			String query = "Select distinct endDate from ";
 			stmt = connection.prepareStatement(query + this.BUS_EXCEPTION + " order by endDate");
@@ -1025,7 +1023,7 @@ public class SQLiteConnection {
 		    FileWriter out = null;
 		    for (int i = 0; i < dateList.size(); i++) {
 		    	int curr = dateList.get(i);
-				File dir = new File("/Users/cse/Thesis/data/simo." + curr);
+				File dir = new File(DATA_FILE_DIR + "simo." + curr);
 				if (!dir.exists()) {
 					if (dir.mkdir()) {
 						System.out.println("Directory is created!");
@@ -1064,7 +1062,7 @@ public class SQLiteConnection {
 		    out = null;
 		    for (int i = 0; i < dateList.size(); i++) {
 		    	int curr = dateList.get(i);
-				File dir = new File("/Users/cse/Thesis/data/simo." + curr);
+				File dir = new File(DATA_FILE_DIR + "simo." + curr);
 				if (!dir.exists()) {
 					if (dir.mkdir()) {
 						System.out.println("Directory is created!");
@@ -1103,7 +1101,7 @@ public class SQLiteConnection {
 		    out = null;
 		    for (int i = 0; i < dateList.size(); i++) {
 		    	int curr = dateList.get(i);
-				File dir = new File("/Users/cse/Thesis/data/simo." + curr);
+				File dir = new File(DATA_FILE_DIR + "simo." + curr);
 				if (!dir.exists()) {
 					if (dir.mkdir()) {
 						System.out.println("Directory is created!");
@@ -1142,7 +1140,7 @@ public class SQLiteConnection {
 		    out = null;
 		    for (int i = 0; i < dateList.size(); i++) {
 		    	int curr = dateList.get(i);
-				File dir = new File("/Users/cse/Thesis/data/simo." + curr);
+				File dir = new File(DATA_FILE_DIR + "simo." + curr);
 				if (!dir.exists()) {
 					if (dir.mkdir()) {
 						System.out.println("Directory is created!");

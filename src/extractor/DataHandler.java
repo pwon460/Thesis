@@ -8,7 +8,7 @@ import java.util.Calendar;
 
 public class DataHandler {
 
-	private static final String DESTINATION = "/Users/cse/Thesis/unzipTester";
+	private static final String DESTINATION = "/Thesis/Downloads";
 
 	public DataHandler() {
 		// TODO Auto-generated constructor stub
@@ -16,7 +16,7 @@ public class DataHandler {
 
 	public static ArrayList<File> getExtractedData() {
 		ArrayList<File> files = new ArrayList<File>();
-		File folder = new File("/Users/cse/Thesis/data");
+		File folder = new File(DESTINATION);
 		File[] listOfFiles = folder.listFiles();
 		File init = null;
 		File patch = null;
@@ -56,11 +56,12 @@ public class DataHandler {
 		
 	}
 	// Below stuffs are for testing purpose
+	/*
 	private File data;
 	public File getExtractedDataTest() {
 		return data;
 	}
-
+	
 	public static void extractDataTest (File source) {
 		System.out.println("Start ExtractData");
 		File zipFile = source;
@@ -75,4 +76,5 @@ public class DataHandler {
 		File source = new File("/Users/cse/Thesis/transxchange2.zip");
 		extractDataTest(source);
 	}
+	*/
 }
