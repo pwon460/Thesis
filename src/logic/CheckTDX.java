@@ -29,8 +29,9 @@ import org.quartz.JobDataMap;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 
-import extractor.FileHandler;
-import extractor.MockDataHandler;
+import extractor.DataHandler;
+//import extractor.FileHandler;
+//import extractor.MockDataHandler;
 
 public class CheckTDX implements Job {
 
@@ -90,7 +91,6 @@ public class CheckTDX implements Job {
 
 		System.out.println("downloading file from tdx");
 		downloadZip(); // download file from TDX and save it as temp.zip
-
 		while (!path2.equals("") && isZipMalformed(path2)) {
 			System.out.println("zip 2 malformed, redownloading");
 			downloadZip();
@@ -289,17 +289,22 @@ public class CheckTDX implements Job {
 		// save timestamp of new update/version of data
 		System.out.println("setting context attributes");
 		Path p = Paths.get(path1);
-		FileHandler fileHandler = new MockDataHandler();
+		//FileHandler fileHandler = new MockDataHandler();
 		ArrayList<File> extracted = null;
-
 		if (hasUpdate) {
-			extracted = fileHandler.extractData(p.toFile());
+			DataHandler.setServletPath(ctx.getRealPath(""));
+			extracted = DataHandler.extractData(p.toFile());
 		} else {
-			extracted = fileHandler.getExtractedData();
+			DataHandler.setServletPath(ctx.getRealPath(""));
+			extracted = DataHandler.getExtractedData();
 		}
 		
 		ArrayList<Path> filePaths = new ArrayList<Path>();
+		System.out.println("Passed file lists in checkTDX " + extracted.size());
 		for (File f : extracted) {
+			//System.out.println("CheckTDX - handleFile() ");
+			//System.out.println("passed file name is " + f.getName());
+			//System.out.println(f.toPath());
 			filePaths.add(f.toPath());
 		}
 

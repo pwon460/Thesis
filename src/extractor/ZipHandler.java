@@ -11,7 +11,7 @@ import java.util.zip.ZipInputStream;
 public class ZipHandler {
 
 	//private final String SOURCE = "/Users/cse/Thesis/transxchange2.zip";
-	private final String DESTINATION = "/Users/cse/Thesis/unzipTester";
+	//private final String DESTINATION = "/Users/cse/Thesis/unzipTester";
 	private ArrayList<File> filePaths;
 	
 	// Testing purpose
@@ -69,7 +69,8 @@ public class ZipHandler {
 		try {
 			// Create output directory if not exist.
 			// Otherwise, deletes existing directory then create it.
-			File directory = new File(this.DESTINATION);
+			//File directory = new File(this.DESTINATION);
+			File directory = new File(outputFolder + "/unZipTester");
 			if (!directory.exists()) {
 				directory.mkdir();
 			} else {
@@ -82,12 +83,13 @@ public class ZipHandler {
 			ZipEntry entry = input.getNextEntry();
 			while (entry != null) {
 				String fileName = entry.getName();
-				File newFile = new File(outputFolder + File.separator+ fileName);
+				File newFile = new File(outputFolder + "/unZipTester" + File.separator+ fileName);
 				// System.out.println(newFile.getAbsolutePath() + " is created");
 				if (entry.isDirectory()) {
 					new File(newFile.getParent()).mkdir();
 				} else {
 					if (this.isXML(newFile.getName())) {
+////////////////////////// getAbsolulteFile()???
 						filePaths.add(newFile.getAbsoluteFile());
 						new File(newFile.getParent()).mkdirs();
 						FileOutputStream output = new FileOutputStream(newFile);

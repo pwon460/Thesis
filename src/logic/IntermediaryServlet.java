@@ -36,7 +36,7 @@ public class IntermediaryServlet extends HttpServlet {
 		// there's potential that the file hasn't been finished downloaded yet
 		TDXData = (ArrayList<Path>) getServletContext().getAttribute(
 				"mostRecentData");
-
+		
 		// handle with error message
 		if (TDXData == null) {
 			response.setHeader("status", "error");

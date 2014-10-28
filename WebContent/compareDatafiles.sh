@@ -1,12 +1,16 @@
 #!/bin/bash
-mkdir -p "/Thesis/Downloads/initial"
-dirPath="/Thesis/Downloads/initial/new"
+BASEDIR=$(dirname $0)
+echo $BASEDIR
+if [ ! -d "$BASEDIR/Downloads/initial" ]; then
+	mkdir -p "$BASEDIR/Downloads/initial"
+fi
+dirPath="$BASEDIR/Downloads/initial/new"
 mkdir "$dirPath"
-sqlite3 /Users/cse/Thesis/server2.db <<!
+sqlite3 $BASEDIR/server2.db <<!
 .headers off
 .mode csv
 .output $dirPath/bus_stops.txt
-select * from stops;
+select * from STOPS;
 .output $dirPath/bus_routes_orders.txt
 select * from bus_routes_orders;
 .output $dirPath/bus_routes_names.txt
@@ -62,8 +66,8 @@ select privateCode, dayId, routeId, journeyPatternSectionId, departureTime from 
 .output $dirPath/light_rail_trips.txt
 select journeyPatternSectionId, seq, arrival from light_rail_trips order by journeyPatternSectionId, seq;
 !
-currDir="/Thesis/Downloads/initial/curr"
-diffDir="/Thesis/Downloads/initial/change"
+currDir="$BASEDIR/Downloads/initial/curr"
+diffDir="$BASEDIR/Downloads/initial/change"
 mkdir -p "$currDir"
 if [ -d "$diffDir" ]; then
 	rm -r "$diffDir"
@@ -79,7 +83,7 @@ diff --changed-group-format="%<" --unchanged-group-format="" "$dirPath/$filename
 done
 rm -r $currDir
 mv $dirPath $currDir
-zipFilePath="/Thesis/Downloads"
+zipFilePath="$BASEDIR/Downloads"
 zip -rj "$zipFilePath/simo.init.zip" "$currDir"
 now=$(date +"%Y%m%d")
 zip -rj "$zipFilePath/simo.patch.$now.zip" "$diffDir"

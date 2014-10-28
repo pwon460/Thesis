@@ -21,8 +21,8 @@ import java.util.Comparator;
 
 public class SQLiteConnection {
 	
-	final static String DATABASE_PATH = "jdbc:sqlite:/Thesis/server2.db";
-	final static String DATA_FILE_DIR = "/Thesis/Downloads/";
+	static String DATABASE_PATH = "jdbc:sqlite:";//server2.db";
+	static String DATA_FILE_DIR = new File("").getAbsolutePath() + "/Thesis/Downloads/";
 	// Table names.
 	// Table names are decided considering dropping order of tables to avoid any conflict.
 	final String STOPS = "STOPS";
@@ -80,6 +80,8 @@ public class SQLiteConnection {
 	public SQLiteConnection() {
 		Connection connection = null;
 		PreparedStatement stmt = null;
+		System.err.println("In SQLiteConnection DATA_FILE_PATH is " + DATA_FILE_DIR);
+		//System.out.println("parent of parent is " + new File("").getParentFile().getParentFile().getAbsolutePath());
     	try{
     		File file = new File(DATABASE_PATH);
     		file.delete();
@@ -87,8 +89,15 @@ public class SQLiteConnection {
     		e.printStackTrace(); 
     	}
 		try {
+			//String path = this.getServletContext().getRealPath("tmp/test.db");
+			//Class.forName("org.sqlite.JDBC");
 			Class.forName("org.sqlite.JDBC");
+			System.out.println("IN SQLite servelet path: " + DataHandler.getServletPath());
+			DATABASE_PATH = DATABASE_PATH + DataHandler.getServletPath() + "/server2.db";
+			DATA_FILE_DIR = DataHandler.getServletPath() + "/Downloads/";
 			connection = DriverManager.getConnection(DATABASE_PATH);
+			//connection = DriverManager.getConnection(DATABASE_PATH + DataHandler.getServletPath());
+			System.out.println("IN SQLite servelet path: " + DataHandler.getServletPath());
 			connection.setAutoCommit(false);
 
 			// Create all tables
@@ -980,11 +989,23 @@ public class SQLiteConnection {
 	
 	public void makeInitialDataFile() {
 		// run shell script to generates initial database files
-		String command = "sh /Thesis/compareDatafiles.sh ";
+		System.out.println("makeInitialDataFile : " + DataHandler.getServletPath());
+		/*
+		File currentDirectory = new File(new File(".").getAbsolutePath());
+		try {
+			System.out.println(currentDirectory.getCanonicalPath());
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		*/
+		String command = "sh " + DataHandler.getServletPath() + "/compareDatafiles.sh ";
+		System.out.println("run shell script command is " + command);
 		Process proc;
 		try {
 			proc = Runtime.getRuntime().exec(command);
-		} catch (IOException e) {
+			proc.waitFor();
+		} catch (IOException | InterruptedException e) {
 			System.out.println("Error occurs");
 			e.printStackTrace();
 		}
@@ -993,12 +1014,16 @@ public class SQLiteConnection {
 	
 	public void zipWeeklyFiles() {
 		// run shell script to zip weekly files
-		String command = "sh /Thesis/zipByDate.sh ";
+		String command = "sh " + DataHandler.getServletPath() + "/zipByDate.sh ";
+		System.out.println("zipWeeklyFiles() command is " + command);
 		Process proc;
 		try {
 			proc = Runtime.getRuntime().exec(command);
+			proc.waitFor();
 		} catch (IOException e) {
 			System.out.println("Error occurs");
+			e.printStackTrace();
+		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
 		System.out.println("Zipped weekly files.");		
