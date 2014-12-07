@@ -830,6 +830,9 @@ public class SQLiteConnection {
 			}
 			System.out.println("calcualted weeks");
 
+////////////////////////////////////////////////////////////////////////////
+//			something wrong in here
+////////////////////////////////////////////////////////////////////////////
 			// insert calendar data
 			// sort keys by privateCode in VehicleJourney
 			List<String> sortedPrivateCode = new ArrayList<String>(vehicleJourneys.keySet());
@@ -1058,7 +1061,7 @@ public class SQLiteConnection {
 				}
 				try {
 					out = new FileWriter(dir + "/bus_exception.txt");
-					stmt = connection.prepareStatement("Select privateCode, dayId from " + this.BUS_EXCEPTION + " where endDate = ?");
+					stmt = connection.prepareStatement("Select distinct privateCode, dayId from " + this.BUS_EXCEPTION + " where endDate = ?");
 					stmt.setInt(1, curr);
 					ResultSet entries = stmt.executeQuery();
 					while (entries.next()) {
@@ -1097,7 +1100,7 @@ public class SQLiteConnection {
 				}
 				try {
 					out = new FileWriter(dir + "/rail_exception.txt");
-					stmt = connection.prepareStatement("Select privateCode, dayId from " + this.RAIL_EXCEPTION + " where endDate = ?");
+					stmt = connection.prepareStatement("Select distinct privateCode, dayId from " + this.RAIL_EXCEPTION + " where endDate = ?");
 					stmt.setInt(1, curr);
 					ResultSet entries = stmt.executeQuery();
 					while (entries.next()) {
@@ -1136,7 +1139,7 @@ public class SQLiteConnection {
 				}
 				try {
 					out = new FileWriter(dir + "/ferry_exception.txt");
-					stmt = connection.prepareStatement("Select privateCode, dayId from " + this.FERRY_EXCEPTION + " where endDate = ?");
+					stmt = connection.prepareStatement("Select distinct privateCode, dayId from " + this.FERRY_EXCEPTION + " where endDate = ?");
 					stmt.setInt(1, curr);
 					ResultSet entries = stmt.executeQuery();
 					while (entries.next()) {
@@ -1175,7 +1178,7 @@ public class SQLiteConnection {
 				}
 				try {
 					out = new FileWriter(dir + "/light_rail_exception.txt");
-					stmt = connection.prepareStatement("Select privateCode, dayId from " + this.LIGHT_RAIL_EXCEPTION + " where endDate = ?");
+					stmt = connection.prepareStatement("Select distinct privateCode, dayId from " + this.LIGHT_RAIL_EXCEPTION + " where endDate = ?");
 					stmt.setInt(1, curr);
 					ResultSet entries = stmt.executeQuery();
 					while (entries.next()) {

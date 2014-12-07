@@ -4,30 +4,34 @@ echo $BASEDIR
 if [ ! -d "$BASEDIR/Downloads/initial" ]; then
 	mkdir -p "$BASEDIR/Downloads/initial"
 fi
+tempPath="$BASEDIR/Downloads/initial/temp"
+mkdir "$tempPath"
 dirPath="$BASEDIR/Downloads/initial/new"
 mkdir "$dirPath"
 sqlite3 $BASEDIR/server2.db <<!
 .headers off
 .mode csv
-.output $dirPath/bus_stops.txt
+.output $tempPath/bus_stops.txt
 select * from STOPS;
 .output $dirPath/bus_routes_orders.txt
 select * from bus_routes_orders;
-.output $dirPath/bus_routes_names.txt
+.output $tempPath/bus_routes_names.txt
+select * from (
 select distinct d.routeId, s.lineName, p.description
 from bus_calendar as d
 join bus_patterns as p on d.journeyPatternSectionId = p.journeyPatternSectionRef
 join bus_sections as s on p.journeyPatternSectionRef = s.journeyPatternSectionId
-order by cast (s.lineName as integer);
+order by s.lineName)
+order by cast (lineName as integer);
 .output $dirPath/bus_calendar.txt
 select privateCode, dayId, routeId, journeyPatternSectionId, departureTime from bus_calendar;
 .output $dirPath/bus_trips.txt
 select journeyPatternSectionId, seq, arrival from bus_trips order by journeyPatternSectionId, seq;
-.output $dirPath/rail_stations.txt
+.output $tempPath/rail_stations.txt
 select * from rail_stations;
 .output $dirPath/rail_routes_orders.txt
 select * from rail_routes_orders;
-.output $dirPath/rail_routes_names.txt
+.output $tempPath/rail_routes_names.txt
 select distinct d.routeId, s.lineName, p.description
 from rail_calendar as d
 join rail_patterns as p on d.journeyPatternSectionId = p.journeyPatternSectionRef
@@ -37,11 +41,11 @@ order by cast (s.lineName as integer);
 select privateCode, dayId, routeId, journeyPatternSectionId, departureTime from rail_calendar;
 .output $dirPath/rail_trips.txt
 select journeyPatternSectionId, seq, arrival from rail_trips order by journeyPatternSectionId, seq;
-.output $dirPath/ferry_wharfs.txt
+.output $tempPath/ferry_wharfs.txt
 select * from wharfs;
 .output $dirPath/ferry_routes_orders.txt
 select * from ferry_routes_orders;
-.output $dirPath/ferry_routes_names.txt
+.output $tempPath/ferry_routes_names.txt
 select distinct d.routeId, s.lineName, p.description
 from ferry_calendar as d
 join ferry_patterns as p on d.journeyPatternSectionId = p.journeyPatternSectionRef
@@ -51,11 +55,11 @@ order by cast (s.lineName as integer);
 select privateCode, dayId, routeId, journeyPatternSectionId, departureTime from ferry_calendar;
 .output $dirPath/ferry_trips.txt
 select journeyPatternSectionId, seq, arrival from ferry_trips order by journeyPatternSectionId, seq;
-.output $dirPath/light_rail_stations.txt
+.output $tempPath/light_rail_stations.txt
 select * from light_rail_stations;
 .output $dirPath/light_rail_routes_orders.txt
 select * from light_rail_routes_orders;
-.output $dirPath/light_rail_routes_names.txt
+.output $tempPath/light_rail_routes_names.txt
 select distinct d.routeId, s.lineName, p.description
 from light_rail_calendar as d
 join light_rail_patterns as p on d.journeyPatternSectionId = p.journeyPatternSectionRef
@@ -65,7 +69,20 @@ order by cast (s.lineName as integer);
 select privateCode, dayId, routeId, journeyPatternSectionId, departureTime from light_rail_calendar;
 .output $dirPath/light_rail_trips.txt
 select journeyPatternSectionId, seq, arrival from light_rail_trips order by journeyPatternSectionId, seq;
+.output $dirPath/days_variation.txt
+select * from days_variation;
 !
+sed 's/"//g' "$tempPath/bus_stops.txt" > "$dirPath/bus_stops.txt"
+sed 's/"//g' "$tempPath/rail_stations.txt" > "$dirPath/rail_stations.txt"
+sed 's/"//g' "$tempPath/ferry_wharfs.txt" > "$dirPath/ferry_wharfs.txt"
+sed 's/"//g' "$tempPath/light_rail_stations.txt" > "$dirPath/light_rail_stations.txt"
+sed 's/"//g' "$tempPath/bus_routes_names.txt" > "$dirPath/bus_routes_names.txt"
+sed 's/"//g' "$tempPath/rail_routes_names.txt" > "$dirPath/rail_routes_names.txt"
+sed 's/"//g' "$tempPath/ferry_routes_names.txt" > "$dirPath/ferry_routes_names.txt"
+sed 's/"//g' "$tempPath/light_rail_routes_names.txt" > "$dirPath/light_rail_routes_names.txt"
+if [ -d "$tempfDir" ]; then
+	rm -r "$tempDir"
+fi
 currDir="$BASEDIR/Downloads/initial/curr"
 diffDir="$BASEDIR/Downloads/initial/change"
 mkdir -p "$currDir"
